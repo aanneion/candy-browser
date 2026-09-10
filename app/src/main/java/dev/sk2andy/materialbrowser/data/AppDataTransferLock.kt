@@ -47,7 +47,7 @@ internal object AppDataTransferLock {
         if (owner.isAlive(context)) return@withGuard true
         lock.delete()
         false
-    } ?: true
+    } ?: false
 
     fun release(context: Context, token: String) {
         withGuard(context) {

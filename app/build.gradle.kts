@@ -181,6 +181,8 @@ android {
             buildConfigField("boolean", "ENABLE_GITHUB_UPDATES", "true")
             if (hasReleaseSigning) {
                 signingConfig = signingConfigs.getByName("release")
+            } else {
+                signingConfig = signingConfigs.getByName("debug")
             }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
