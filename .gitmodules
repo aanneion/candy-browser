@@ -1,0 +1,3 @@
+[submodule "iosApp/derived-data/SourcePackages/checkouts/argon2-swift"]
+	path = iosApp/derived-data/SourcePackages/checkouts/argon2-swift
+	url = https://github.com/argon2/argon2

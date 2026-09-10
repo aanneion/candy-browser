@@ -17,3 +17,8 @@ __pycache__/
 memory/
 task/
 tracking/
+
+# Xcode and iOS derived data caches
+iosApp/derived-data/
+**/DerivedData/
+*.xcuserstate
