@@ -101,6 +101,7 @@ generated entirely from repository-owned sources.
 - **Made for gestures.** Switch tabs from the address bar, swipe into the visual overview, and
   dismiss cards with spring motion and haptic feedback.
 - **Private by design.** Filtering, history, favorites, profiles, and privacy telemetry stay local.
+- **Anti-fingerprinting built in.** Defends against Canvas, WebGL, AudioContext, and hardware-level tracking out of the box.
 - **Cross-device without surrendering your data.** Self-hosted E2EE sync exposes desktop and Android
   tab lists as writable device profiles while the server never sees their contents in plaintext.
 - **Feels at home on Android.** Dynamic color, edge-to-edge content, Predictive Back, Autofill,
@@ -220,6 +221,11 @@ landscape-oriented previews in Coverflow and the compact grid layout.
 - EasyList/EasyPrivacy hosts and cosmetics, a pinned safely representable uAssets subset, and a
   pinned HaGeZi Pro host delta
 - Third-party-cookie blocking and cosmetic cookie-banner hiding
+- **Advanced Anti-Fingerprinting Defense:** Client-side hardware and API spoofing to defeat invasive web fingerprinting:
+  - **Canvas & Audio randomization:** Injects subtle, non-destructive mathematical noise into HTML5 Canvas and AudioContext outputs to prevent deterministic device profiling.
+  - **WebGL Cloaking:** Masks GPU vendor, unmasked renderer, and WebGL parameter queries with standardized safe values.
+  - **Hardware & Battery API Protection:** Normalizes CPU concurrency count, device memory values, and spoofed Battery Status metrics.
+  - **Screen & Metrics Normalization:** Standardizes color depth, pixel depth, and available screen bounds to prevent tracking through device geometry.
 - **Privacy X-Ray:** live per-tab block counts, categories, domains, and exceptions
 - **Permission Radar:** per-site camera, microphone, location, and other WebView permission activity
 - **Filter Studio:** global or profile rules, import/export, and confirmed HTTPS subscriptions
@@ -358,6 +364,10 @@ this side-by-side build because production APKs cannot update its package. The G
 workflow uses `assembleFullRelease`, `assembleFossRelease`, and `assembleFullUserCaRelease`; those
 outputs use the standard, `.foss`, and `.ca` application IDs and matching launcher identities. A
 separate workflow signs and publishes the FOSS output from explicitly allowlisted release tags.
+
+For forks or automated CI runs without custom release credentials, builds automatically fall back
+to standard debug signing certificates so that minified release APKs (~12 MB) can be built and tested
+immediately via GitHub Actions without requiring secret configuration.
 
 ### GitHub releases
 

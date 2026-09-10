@@ -374,6 +374,11 @@ val validateReleaseSigning by tasks.registering {
     description = "Checks that release signing credentials and the keystore are available."
 
     doLast {
+        if (!hasReleaseSigning) {
+            logger.lifecycle("Release signing credentials not configured; using debug signingConfig fallback.")
+            return@doLast
+        }
+
         check(missingReleaseSigningValues.isEmpty()) {
             "Missing release signing values: ${missingReleaseSigningValues.sorted().joinToString()}. " +
                 "Configure keystore.properties or the CANDY_RELEASE_* environment variables."
