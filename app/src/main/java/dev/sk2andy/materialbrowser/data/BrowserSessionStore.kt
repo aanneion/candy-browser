@@ -214,6 +214,7 @@ class BrowserSessionStore internal constructor(
                                         selectedTabId = item.optString("selectedTabId")
                                             .takeIf(String::isNotBlank),
                                         isolationEnabled = item.optBoolean("isolationEnabled", false),
+                                        fingerprintPreset = item.optString("fingerprintPreset", "default"),
                                         newTabWallpaper = if (hasTargetWallpapers) {
                                             item.optJSONObject("newTabWallpaper")
                                                 ?.toProfileWallpaper()
@@ -251,6 +252,7 @@ class BrowserSessionStore internal constructor(
                     .put("emoji", profile.emoji)
                     .put("selectedTabId", profile.selectedTabId)
                     .put("isolationEnabled", profile.isolationEnabled)
+                    .put("fingerprintPreset", profile.fingerprintPreset)
                     .put(
                         "newTabWallpaper",
                         profile.newTabWallpaper.toJson(),

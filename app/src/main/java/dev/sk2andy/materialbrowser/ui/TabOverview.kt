@@ -2576,6 +2576,11 @@ internal fun TabOverview(
                 profileActionsProfileId = null
                 profileIsolationChange = target.id to enabled
             },
+            onFingerprintChange = { presetId ->
+                val target = actionProfile ?: return@ProfileActionsSheet
+                controller.setProfileFingerprint(target.id, presetId)
+                rootView.performConfirmHaptic()
+            },
             onDismiss = { profileActionsProfileId = null },
         )
 

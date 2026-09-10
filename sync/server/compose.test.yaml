@@ -1,6 +1,0 @@
-services:
-  tests:
-    build:
-      context: .
-      target: test
-    network_mode: none

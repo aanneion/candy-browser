@@ -5,6 +5,7 @@ data class BrowserProfile(
     val emoji: String,
     val selectedTabId: String? = null,
     val isolationEnabled: Boolean = false,
+    val fingerprintPreset: String = "default",
     val syncedDeviceId: String? = null,
     val syncedDisplayName: String? = null,
     val syncedIconCatalogId: String? = null,

@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.sk2andy.materialbrowser.R
 import dev.sk2andy.materialbrowser.browser.BrowserProfile
+import dev.sk2andy.materialbrowser.browser.ProfileFingerprintRules
 import dev.sk2andy.materialbrowser.browser.ProfileWallpaperTarget
 import dev.sk2andy.materialbrowser.ui.theme.browserChromeColor
 
@@ -61,9 +62,14 @@ internal fun ProfileActionsSheet(
     onCustomizeWallpaper: (ProfileWallpaperTarget) -> Unit,
     onDelete: () -> Unit,
     onIsolationChange: (Boolean) -> Unit,
+    onFingerprintChange: (String) -> Unit = {},
     onDismiss: () -> Unit,
 ) {
     if (profile == null) return
+    var showFingerprintOptions by remember { mutableStateOf(false) }
+    val currentPreset = remember(profile.fingerprintPreset) {
+        ProfileFingerprintRules.Preset.fromId(profile.fingerprintPreset)
+    }
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         containerColor = browserChromeColor(MaterialTheme.colorScheme.surfaceContainerLow),
@@ -112,6 +118,59 @@ internal fun ProfileActionsSheet(
                 enabled = isolationSupported,
                 onCheckedChange = onIsolationChange,
             )
+            Spacer(Modifier.height(8.dp))
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { showFingerprintOptions = !showFingerprintOptions }
+                    .padding(vertical = 8.dp),
+            ) {
+                Text(
+                    text = stringResource(R.string.settings_profile_fingerprint_title),
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                Text(
+                    text = currentPreset.label,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Text(
+                    text = stringResource(R.string.settings_profile_fingerprint_subtitle),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            if (showFingerprintOptions) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 8.dp, top = 4.dp, bottom = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    ProfileFingerprintRules.Preset.entries.forEach { preset ->
+                        val isSelected = preset.id == profile.fingerprintPreset
+                        Surface(
+                            shape = CircleShape,
+                            color = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    onFingerprintChange(preset.id)
+                                    showFingerprintOptions = false
+                                },
+                        ) {
+                            Text(
+                                text = preset.label,
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                            )
+                        }
+                    }
+                }
+            }
             if (canDelete) {
                 TextButton(
                     onClick = onDelete,

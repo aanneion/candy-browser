@@ -1,0 +1,12 @@
+{
+  "name": "Candy Browser",
+  "description": "A modern, gesture-driven and privacy-first web browser with True Multi-Profile Isolation, Hardware & Fingerprint Spoofing, Candy Trails, Site Capsules, Privacy X-Ray, and Reader Studio.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

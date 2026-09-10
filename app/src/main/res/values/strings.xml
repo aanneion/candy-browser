@@ -146,6 +146,14 @@
     <string name="profile_isolation_enable_message">Tabs in this profile will reload with separate storage. Existing shared sign-ins will not carry over.</string>
     <string name="profile_isolation_disable_message">Tabs in this profile will reload with shared storage. Sign-ins from isolated storage will no longer be active.</string>
     <string name="action_switch_storage">Switch storage</string>
+    <string name="settings_profile_fingerprint_title">Hardware &amp; Fingerprint Spoofing</string>
+    <string name="settings_profile_fingerprint_subtitle">Emulate platform signatures (OS, WebGL, Cores, User-Agent) to prevent tracking</string>
+    <string name="fingerprint_preset_default">Default (Android Mobile)</string>
+    <string name="fingerprint_preset_windows">Windows · Chrome</string>
+    <string name="fingerprint_preset_macos">macOS · Safari</string>
+    <string name="fingerprint_preset_ios">iPhone · Safari</string>
+    <string name="fingerprint_preset_linux">Linux · Firefox</string>
+    <string name="fingerprint_preset_stealth">Stealth · Ghost Mode</string>
     <string name="blocked_items_badge">◈ %1$d</string>
     <string name="incognito">Incognito</string>
     <string name="cd_make_blank_tab_incognito">Make blank tab incognito</string>

@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --color-candy-pink: #FF2F78;
+    --color-candy-purple: #7457D7;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+  }
+}
+
+/* Custom scrollbars for a polished native browser feel */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(160, 160, 160, 0.2);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(160, 160, 160, 0.4);
+}
+
+/* Smooth motion utilities */
+.candy-mesh-bg {
+  background: radial-gradient(at 0% 0%, rgba(255, 47, 120, 0.25) 0px, transparent 50%),
+              radial-gradient(at 100% 100%, rgba(116, 87, 215, 0.25) 0px, transparent 50%),
+              radial-gradient(at 50% 50%, rgba(30, 27, 46, 0.8) 0px, transparent 100%),
+              #121118;
+}
+
+.candy-sunset-bg {
+  background: radial-gradient(at 100% 0%, rgba(251, 146, 60, 0.2) 0px, transparent 50%),
+              radial-gradient(at 0% 100%, rgba(225, 29, 72, 0.2) 0px, transparent 50%),
+              #16131d;
+}
+
+.dark-nebula-bg {
+  background: radial-gradient(at 20% 20%, rgba(147, 51, 234, 0.2) 0px, transparent 60%),
+              radial-gradient(at 80% 80%, rgba(59, 130, 246, 0.2) 0px, transparent 60%),
+              #0f0e17;
+}
+
+.minimal-slate-bg {
+  background: #12141a;
+}

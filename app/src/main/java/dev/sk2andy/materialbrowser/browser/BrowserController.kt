@@ -4121,7 +4121,11 @@ class BrowserController(
             )
         }
 
-    fun createProfile(emoji: String, isolationEnabled: Boolean = false): String? {
+    fun createProfile(
+        emoji: String,
+        isolationEnabled: Boolean = false,
+        fingerprintPreset: String = "default",
+    ): String? {
         if (!profilesEnabled) return null
         if (localProfiles.size >= MAX_PROFILES) {
             Toast.makeText(
@@ -4156,6 +4160,7 @@ class BrowserController(
                 requested = isolationEnabled,
                 multiProfileSupported = isProfileIsolationSupported,
             ),
+            fingerprintPreset = fingerprintPreset,
         )
         profiles += profile
         activeProfileId = profile.id
@@ -4317,6 +4322,23 @@ class BrowserController(
         externalLinkPreviewState
             ?.takeIf { it.targetProfileId == profileId }
             ?.let(::recreateExternalLinkPreviewRuntime)
+        persist()
+        return true
+    }
+
+    fun setProfileFingerprint(profileId: String, presetId: String): Boolean {
+        if (isSyncedProfile(profileId)) return false
+        val index = profiles.indexOfFirst { it.id == profileId }
+        if (index < 0 || profiles[index].fingerprintPreset == presetId) return false
+        profiles[index] = profiles[index].copy(fingerprintPreset = presetId)
+        tabs.asSequence()
+            .filter { it.profileId == profileId }
+            .forEach { tab ->
+                webViews[tab.id]?.let { view ->
+                    applyDesktopViewPolicy(tab, view, pageUrls[tab.id] ?: tab.url)
+                    injectFingerprintSpoofingScript(tab.id, view)
+                }
+            }
         persist()
         return true
     }
@@ -7522,6 +7544,7 @@ class BrowserController(
             injectForcedVerticalScrollFallback(tabId, view, url)
             injectForcedPageZoomFallback(tabId, view, url)
             injectCandyCosmeticFallback(tabId, view, url)
+            injectFingerprintSpoofingScript(tabId, view)
         }
 
         override fun onPageFinished(view: WebView, url: String) {
@@ -8054,6 +8077,17 @@ class BrowserController(
         contentBlocker.windowOpenDefuserScript(pageUrl)
             .takeIf(String::isNotEmpty)
             ?.let { defuserScript -> view.evaluateJavascript(defuserScript, null) }
+    }
+
+    private fun injectFingerprintSpoofingScript(tabId: String, view: WebView) {
+        val tab = tabs.firstOrNull { it.id == tabId } ?: return
+        val profile = profiles.firstOrNull { it.id == tab.profileId }
+        val preset = ProfileFingerprintRules.Preset.fromId(profile?.fingerprintPreset)
+        if (preset == ProfileFingerprintRules.Preset.DEFAULT) return
+        val script = ProfileFingerprintRules.spoofingScriptFor(preset)
+        if (script.isNotEmpty()) {
+            view.evaluateJavascript(script, null)
+        }
     }
 
     private fun installCosmeticDocumentStartScripts(
@@ -12516,11 +12550,14 @@ class BrowserController(
         val enabled = isDesktopView(tab, pageUrl)
         val federatedLoginCompatibility = tab.id in federatedLoginCompatibilityTabIds ||
             isFederatedLoginCompatibilityEnabled(tab, pageUrl)
+        val profile = profiles.firstOrNull { it.id == tab.profileId }
+        val fingerprintPreset = ProfileFingerprintRules.Preset.fromId(profile?.fingerprintPreset)
+        val hasCustomFingerprint = fingerprintPreset != ProfileFingerprintRules.Preset.DEFAULT
         val desiredUserAgent = desiredDesktopViewUserAgent(tab, pageUrl)
         val defaultMetadata = defaultUserAgentMetadata(webView.settings)
         with(webView.settings) {
             if (userAgentString != desiredUserAgent) {
-                userAgentString = if (enabled || federatedLoginCompatibility) {
+                userAgentString = if (enabled || federatedLoginCompatibility || hasCustomFingerprint) {
                     desiredUserAgent
                 } else {
                     null
@@ -12549,9 +12586,13 @@ class BrowserController(
         val federatedLoginCompatibility = tab.id in federatedLoginCompatibilityTabIds ||
             isFederatedLoginCompatibilityEnabled(tab, pageUrl)
         val defaultUserAgent = WebSettings.getDefaultUserAgent(activity)
+        val profile = profiles.firstOrNull { it.id == tab.profileId }
+        val fingerprintPreset = ProfileFingerprintRules.Preset.fromId(profile?.fingerprintPreset)
         return when {
             enabled -> DesktopSiteRules.desktopUserAgent(defaultUserAgent)
             federatedLoginCompatibility -> FederatedLoginRules.compatibleUserAgent(defaultUserAgent)
+            fingerprintPreset != ProfileFingerprintRules.Preset.DEFAULT ->
+                ProfileFingerprintRules.effectiveUserAgent(fingerprintPreset, defaultUserAgent)
             else -> defaultUserAgent
         }
     }
