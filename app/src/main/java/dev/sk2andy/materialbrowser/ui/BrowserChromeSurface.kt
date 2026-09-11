@@ -60,17 +60,21 @@ internal fun BrowserChromeSurface(
                                 }
                                 outlineProvider = ViewOutlineProvider.BACKGROUND
                                 clipToOutline = true
-                                setupWith(blurTarget, 1f, true)
-                                    .setBlurRadius(tokens.blurRadiusPx)
-                                    .setOverlayColor(containerColor.toArgb())
+                                runCatching {
+                                    setupWith(blurTarget, 1f, true)
+                                        .setBlurRadius(tokens.blurRadiusPx)
+                                        .setOverlayColor(containerColor.toArgb())
+                                }
                             }
                         },
                         update = { blurView ->
                             (blurView.background as? GradientDrawable)?.cornerRadius =
                                 blurCornerRadiusPx
-                            blurView
-                                .setBlurRadius(tokens.blurRadiusPx)
-                                .setOverlayColor(containerColor.toArgb())
+                            runCatching {
+                                blurView
+                                    .setBlurRadius(tokens.blurRadiusPx)
+                                    .setOverlayColor(containerColor.toArgb())
+                            }
                         },
                         onRelease = { blurView -> blurView.setBlurAutoUpdate(false) },
                         modifier = Modifier

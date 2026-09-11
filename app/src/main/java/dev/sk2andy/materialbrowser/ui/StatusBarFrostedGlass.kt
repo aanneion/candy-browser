@@ -21,8 +21,10 @@ internal class StatusBarFrostedGlassHost(context: Context) : FrameLayout(context
         importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
         isClickable = false
         isFocusable = false
-        setupWith(blurTarget, 1f, true)
-            .setOverlayColor(android.graphics.Color.TRANSPARENT)
+        runCatching {
+            setupWith(blurTarget, 1f, true)
+                .setOverlayColor(android.graphics.Color.TRANSPARENT)
+        }
     }
 
     init {
@@ -46,7 +48,7 @@ internal class StatusBarFrostedGlassHost(context: Context) : FrameLayout(context
         setBlurAutoUpdate(showBlur)
         if (!showBlur) return
         blurView.updateFade(geometry, tint)
-        blurView.setBlurRadius(geometry.blurRadiusPx)
+        runCatching { blurView.setBlurRadius(geometry.blurRadiusPx) }
         val layoutParams = blurView.layoutParams
         if (layoutParams.height != geometry.overlayHeightPx) {
             layoutParams.height = geometry.overlayHeightPx

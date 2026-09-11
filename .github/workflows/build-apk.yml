@@ -33,12 +33,19 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
-      - name: Build Full Release APK
-        run: ./gradlew assembleFullRelease
+      - name: Build Release APKs (Full and FOSS)
+        run: ./gradlew assembleFullRelease assembleFossRelease
 
-      - name: Upload Release APK
+      - name: Upload Full Release APK
         uses: actions/upload-artifact@v4
         with:
-          name: candy-browser-release-apk
+          name: candy-browser-full-release-apk
           path: app/build/outputs/apk/full/release/*.apk
+          retention-days: 14
+
+      - name: Upload FOSS Release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: candy-browser-foss-release-apk
+          path: app/build/outputs/apk/foss/release/*.apk
           retention-days: 14

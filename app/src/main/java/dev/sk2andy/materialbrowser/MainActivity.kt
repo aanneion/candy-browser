@@ -11,9 +11,11 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Process
+import android.util.Log
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.widget.Toast
+import java.io.File
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -155,6 +157,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val previousHandler = Thread.getDefaultUncaughtExceptionHandler()
+        Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
+            runCatching {
+                Log.e("CandyBrowser", "Uncaught exception on thread ${thread.name}", throwable)
+                File(filesDir, "last_crash.txt").writeText(
+                    "Timestamp: ${System.currentTimeMillis()}\n" +
+                        "Thread: ${thread.name}\n" +
+                        "Message: ${throwable.message}\n" +
+                        "Stacktrace:\n${throwable.stackTraceToString()}",
+                )
+            }
+            previousHandler?.uncaughtException(thread, throwable)
+        }
         BrowsingHistoryLifecycle.install(application)
         applyAppearanceNightMode(
             BrowserSessionStore(this).loadAppearanceSettings().appearanceMode,
@@ -988,20 +1003,36 @@ class MainActivity : AppCompatActivity() {
     private fun ensureMediaControllers() {
         if (activityDestroyed || !::browserController.isInitialized) return
         if (!::castSessionController.isInitialized) {
-            castSessionController = CastSessionController(
-                context = this,
-                onMediaLoaded = { candidate -> browserController.pauseCastMedia(candidate) },
-            )
+            runCatching {
+                CastSessionController(
+                    context = this,
+                    onMediaLoaded = { candidate -> browserController.pauseCastMedia(candidate) },
+                )
+            }.onSuccess {
+                castSessionController = it
+            }.onFailure { error ->
+                Log.e("CandyBrowser", "Failed to initialize CastSessionController", error)
+            }
         }
-        castSessionController.updateCandidate(browserController.castMediaCandidate)
+        if (::castSessionController.isInitialized) {
+            runCatching {
+                castSessionController.updateCandidate(browserController.castMediaCandidate)
+            }
+        }
         if (!::webMediaSystemSession.isInitialized) {
-            webMediaSystemSession = WebMediaSystemSession(
-                context = this,
-                onPlay = browserController::playActiveWebMedia,
-                onPause = browserController::pauseActiveWebMedia,
-                onStop = browserController::stopActiveWebMedia,
-                onSeekTo = browserController::seekActiveWebMedia,
-            )
+            runCatching {
+                WebMediaSystemSession(
+                    context = this,
+                    onPlay = browserController::playActiveWebMedia,
+                    onPause = browserController::pauseActiveWebMedia,
+                    onStop = browserController::stopActiveWebMedia,
+                    onSeekTo = browserController::seekActiveWebMedia,
+                )
+            }.onSuccess {
+                webMediaSystemSession = it
+            }.onFailure { error ->
+                Log.e("CandyBrowser", "Failed to initialize WebMediaSystemSession", error)
+            }
         }
     }
 
