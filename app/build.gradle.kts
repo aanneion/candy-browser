@@ -177,7 +177,7 @@ android {
         }
 
         release {
-            isMinifyEnabled = true
+            isMinifyEnabled = false
             buildConfigField("boolean", "ENABLE_GITHUB_UPDATES", "true")
             if (hasReleaseSigning) {
                 signingConfig = signingConfigs.getByName("release")

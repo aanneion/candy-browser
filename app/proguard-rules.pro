@@ -57,6 +57,7 @@
 -keep public class * extends android.content.BroadcastReceiver
 -keep public class * extends android.content.ContentProvider
 -keep public class * extends android.app.Application
+-keep class dev.sk2andy.materialbrowser.CandyApplication { *; }
 
 # Preserve enum values and valueOf
 -keepclassmembers enum * {
