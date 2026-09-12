@@ -768,9 +768,11 @@ class BrowserController(
     private val configuredServiceWorkerProfiles = mutableSetOf<String>()
     private var incognitoWebViewProfileName = newIncognitoWebViewProfileName()
     private val mainHandler = Handler(Looper.getMainLooper())
-    val syncIconCatalog = SyncDeviceIconCatalog.decode(
-        activity.assets.open("candy_sync_device_icons_v1.json"),
-    )
+    val syncIconCatalog = runCatching {
+        activity.assets.open("candy_sync_device_icons_v1.json").use(SyncDeviceIconCatalog::decode)
+    }.getOrElse {
+        SyncDeviceIconCatalog.DEFAULT
+    }
     private val syncRepository = CandySyncRepository(
         settingsStore = AndroidSyncSettingsStore(activity),
         vaultStore = AndroidSyncVaultStore(activity),
